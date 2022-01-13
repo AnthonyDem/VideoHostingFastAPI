@@ -1,19 +1,18 @@
+import datetime
+
 from pydantic import BaseModel
 from typing import List
-
-
-class UserSchema(BaseModel):
-    id: int
-    first_name: str
-    last_name: str = None
-    country: str = None
-    email: str = None
-    phone: int = None
+from schemas.user_schemas import UserSchema
 
 
 class UploadVideoSchema(BaseModel):
     title: str
     description: str
+    user: UserSchema
+    file: str
+    created_at: datetime.datetime
+    likes_count: int
+    views_count: int
     tags: List[str] = None
 
 
