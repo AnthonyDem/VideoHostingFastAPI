@@ -2,6 +2,7 @@ import shutil
 
 from typing import List
 from fastapi import UploadFile, File, APIRouter, Form, BackgroundTasks, HTTPException
+from starlette.requests import Request
 from starlette.responses import StreamingResponse
 
 from models.user import User
@@ -38,10 +39,16 @@ async def upload_file(
 
 
 @video_route.get('/video/{video_id}', response_model=Video)
-async def get_video(video_id: int) -> StreamingResponse:
-    file = await Video.objects.select_related("user").get(pk=video_id)
-    file_obj = open(file.dict().get("file"), "rb")
-    return StreamingResponse(file_obj, media_type="video/mp4")
+async def get_video(request: Request, video_id: int) -> StreamingResponse:
+    file_helper = FileHelper()
+    video, status_code, content_length, headers = file_helper.open_file(request=request, video_id=video_id)
+    response = StreamingResponse(video, media_type="video/mp4", status_code=status_code)
+    response.headers.update({
+        'Accept-Ranges': 'bytes',
+        'Content-Length': str(content_length),
+        **headers,
+    })
+    return response
 
 
 @video_route.get('/video')
