@@ -16,14 +16,19 @@ async def root():
 
 
 @video_route.post("/video")
-async def upload_file(title: str = Form(...), desc: str = Form(...), file: UploadFile = File(...)):
-    info = UploadVideoSchema(title=title, description=desc).dict()
+async def upload_file(title: str = Form(...), desc: str = Form(...), user_id: int = Form(...), file: UploadFile = File(...)):
+    user = await User.objects.get(pk=user_id)
     with open(f'{file.filename}', 'wb') as file_obj:
         shutil.copyfileobj(file.file, file_obj)
-    user = await User.objects.first()
-    return await Video.objects.create(user=user, file=file.filename, **info)
+    serialized_video = UploadVideoSchema(title=title, description=desc, user=user, file=file.filename).dict()
+    return await Video.objects.create(**serialized_video)
 
 
 @video_route.get('/video/{video_id}', response_model=Video)
 async def get_video(video_id: int):
-    return Video.objects.select_related("user").get(pk=video_id)
+    return await Video.objects.select_related("user").get(pk=video_id)
+
+
+@video_route.get('/video')
+async def get_videos():
+    return await Video.objects.select_related("user").all()
