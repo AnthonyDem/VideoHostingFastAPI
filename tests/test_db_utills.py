@@ -1,16 +1,15 @@
+import databases
+import sqlalchemy
 from fastapi import FastAPI
-from api.video_api import video_route
-from db import database, metadata, engine
 
 app = FastAPI()
 
-app.state.database = database
+TEST_DB_URL = "sqlite:///test.db"
+database = databases.Database(TEST_DB_URL, force_rollback=True)
+engine = sqlalchemy.create_engine(TEST_DB_URL)
+metadata = sqlalchemy.MetaData()
 metadata.create_all(engine)
-app.include_router(video_route)
-
-
-def get_app():
-    return app
+app.state.database = database
 
 
 @app.on_event("startup")
