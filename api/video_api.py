@@ -33,8 +33,8 @@ async def upload_file(
         raise HTTPException(status_code=418, detail="file format must be mp4")
     user = await User.objects.get(pk=user_id)
     serialized_video = UploadVideoSchema(title=title, description=desc, user=user, file=file.filename).dict()
-    service = VideoService(serialized_video)
-    return await service.create_video()
+    service = VideoService()
+    return await service.create_video(**serialized_video)
 
 
 @video_route.get('/video/{video_id}', response_model=Video)
