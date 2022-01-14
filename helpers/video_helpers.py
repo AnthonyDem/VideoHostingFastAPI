@@ -1,18 +1,17 @@
 import shutil
 from pathlib import Path
-from typing import Optional, Generator
+from typing import Optional, Generator, BinaryIO
 from uuid import uuid4
 
 import ormar.exceptions
 from fastapi import UploadFile, File, HTTPException
 from starlette.requests import Request
-from typing.io import IO
 
 from services.video_service import VideoService
 
 
 class FileHelper(object):
-    def __init__(self, user_id: int, file: UploadFile = File(...)):
+    def __init__(self, user_id: int = None, file: UploadFile = File(...)):
         self.file = file
         self.user_id = user_id
         self.video_service = VideoService()
@@ -24,7 +23,7 @@ class FileHelper(object):
 
     def ranged(
             self,
-            file: IO[bytes],
+            file: BinaryIO,
             start: int = 0,
             end: int = None,
             block_size: int = 8192,
