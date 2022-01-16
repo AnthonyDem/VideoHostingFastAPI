@@ -23,8 +23,8 @@ def apply_migrations():
 # Create a new application for testing
 @pytest.fixture
 def app(apply_migrations: None) -> FastAPI:
-    from app.app.server import get_application
-    return get_application()
+    from app import get_app
+    return get_app()
 
 
 # Grab a reference to our database when needed
