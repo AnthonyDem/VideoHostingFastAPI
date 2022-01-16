@@ -1,4 +1,6 @@
 from fastapi import FastAPI
+
+from api.user_api import user_router
 from api.video_api import video_route
 from db import database, metadata, engine
 
@@ -7,6 +9,7 @@ app = FastAPI()
 app.state.database = database
 metadata.create_all(engine)
 app.include_router(video_route)
+app.include_router(user_router)
 
 
 def get_app():
